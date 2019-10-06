@@ -1,0 +1,112 @@
+﻿@page "/fetchdata"
+@page "/fetchdata/{sortOrder}"
+
+@using BlazorDash.Data
+@using BlazorDash.Services
+@using BlazorDash.Models
+@using Microsoft.EntityFrameworkCore;
+
+@inject IJSRuntime JsRuntime;
+
+
+@inject StudentService StudentService
+
+<div id="bd-activity-indicator-body">
+    <h1>Student's Record</h1>
+
+    <p>This component demonstrates fetching data from a service.</p>
+
+    @if (Students == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+
+                    <th>
+                        <button @onclick="Sort" class="btn-sort">
+                            Last Name
+                        </button>
+                    </th>
+
+
+
+                    <th>First Mid Name</th>
+                    <th>Enrollment Date</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Students)
+                {
+                    <tr>
+                        <td>@student.LastName</td>
+                        <td>@student.FirstMidName</td>
+                        <td>@student.EnrollmentDate.ToShortDateString()</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <div id="bd-activity-indicator" class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+</div>
+@code {
+
+
+    [Parameter]
+    public string sortOrder { get; set; }
+
+    [Parameter]
+    public string NameSort { get; set; }
+
+    [Parameter]
+    public string DateSort { get; set; }
+
+
+    public IList<Student> Students { get; set; }
+
+    public void Sort()
+    {
+        if (string.IsNullOrWhiteSpace(sortOrder))
+        {
+            sortOrder = "sort_asc";
+            Students = Students.OrderBy(order => order.LastName).ToList();
+            return;
+        }
+
+        sortOrder = (sortOrder == "sort_desc" ? "sort_asc" : "sort_desc");
+
+        if (sortOrder == "sort_desc")
+        {
+            Students = Students.OrderByDescending(order => order.LastName).ToList();
+        }
+
+        if (sortOrder == "sort_asc")
+        {
+            Students = Students.OrderBy(order => order.LastName).ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await JsRuntime.InvokeAsync<string>("showIndicator");
+
+        Students = await StudentService.GetStudentsAsync();
+
+        //await JsRuntime.InvokeAsync<string>("hideIndicator");
+
+
+    }
+
+
+}

@@ -61,33 +61,59 @@ else
         </tbody>
     </table>
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">Previous</a>
-            </li>
+    <div class="row">
+        <div class="col-6">
 
-            @for (int i = 0; i < Students.TotalPages; i++)
-            {
-                int index = i + 1;
-                <li class="page-item">
-                    <NavLink class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(index))">
-                        @(index)
-                    </NavLink>
-                </li>
-            }
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
 
-            <li class="page-item active">
-                <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    @for (int i = 0; i < Students.TotalPages; i++)
+                    {
+                        int index = i + 1;
+                        <li class="page-item@(index==PageIndex?" active":"")">
+                            <NavLink class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(index))">
+                                @(index)
+                                @if (index == PageIndex)
+                                {
+                                    <span class="sr-only">(current)</span>
+                                }
+                            </NavLink>
+                        </li>
+                    }
+
+                 
 
 
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-            </li>
-        </ul>
-    </nav>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+
+
+        </div>
+        <div class="col-6">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @pageSize
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    @for (int i = 5; i <= 20; i += 5)
+                    {
+                                int index = i;
+                        <a class="dropdown-item" href="javascript: void(0);" onclick="@(pageSize = index)">@index</a>
+
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 }
 
 
@@ -96,10 +122,10 @@ else
 @code {
     #region pagination
     [Parameter]
-    public int? PageIndex { get; set; }
+    public int PageIndex { get; set; } = 1;
 
     [Parameter]
-    public int pageSize { get; set; }
+    public int pageSize { get; set; } = 5;
     #endregion
 
 
@@ -173,7 +199,7 @@ else
         }
 
         Students = await PaginatedList<Student>.CreateAsync(
-                studentsIQ.AsNoTracking(), PageIndex ?? 1, pageSize);
+                studentsIQ.AsNoTracking(), PageIndex, pageSize);
     }
 
     public void  Next()
@@ -184,7 +210,6 @@ else
     public async void CurrentPage(int pageIndex)
     {
         PageIndex = pageIndex;
-        PageIndex = PageIndex ?? 1;
 
         await GetAllStudents();
     }
@@ -201,7 +226,7 @@ else
             IQueryable<Student> studentsIQ =  StudentService.GetStudentsQueryable();
 
             Students = await PaginatedList<Student>.CreateAsync(
-                    studentsIQ.AsNoTracking(), 1, 5);
+                    studentsIQ.AsNoTracking(), PageIndex, 5);
         }
         catch (Exception ex)
         {
@@ -216,10 +241,10 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-            await    GetAllStudents();
+        await    GetAllStudents();
 
     }
-   
+
 
 
 }

@@ -96,20 +96,17 @@ else
 
         </div>
         <div class="col-6">
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @pageSize
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    @for (int i = 5; i <= 20; i += 5)
-                    {
-                                int index = i;
-                        <a class="dropdown-item" href="javascript: void(0);" onclick="@(pageSize = index)">@index</a>
-
-                    }
-                    
-                </div>
-            </div>
+            <select  @onchange="ChangePageSize">
+                <option value="5">5
+                </option>
+                <option value="10">10
+                </option>
+                <option value="15">15
+                </option>
+                <option value="20">20
+                </option>
+            </select>
+            
         </div>
     </div>
 
@@ -219,6 +216,12 @@ else
 
     }
 
+    public async void ChangePageSize(ChangeEventArgs e)
+    {
+        pageSize = Convert.ToInt32(e.Value.ToString());
+        await GetAllStudents();
+    }
+
     public async Task GetAllStudents()
     {
         try
@@ -226,7 +229,7 @@ else
             IQueryable<Student> studentsIQ =  StudentService.GetStudentsQueryable();
 
             Students = await PaginatedList<Student>.CreateAsync(
-                    studentsIQ.AsNoTracking(), PageIndex, 5);
+                    studentsIQ.AsNoTracking(), PageIndex, pageSize);
         }
         catch (Exception ex)
         {

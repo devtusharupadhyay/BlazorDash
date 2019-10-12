@@ -5,108 +5,221 @@
 @using BlazorDash.Services
 @using BlazorDash.Models
 @using Microsoft.EntityFrameworkCore;
+@using BlazorDash.Utility;
 
 @inject IJSRuntime JsRuntime;
 
 
 @inject StudentService StudentService
 
-<div id="bd-activity-indicator-body">
-    <h1>Student's Record</h1>
 
-    <p>This component demonstrates fetching data from a service.</p>
+<h1>Student's Record</h1>
 
-    @if (Students == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (Students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>
+                    <button @onclick="@(e => Sort("last_name"))" class="btn-sort">
+                        Last Name
+                    </button>
+                </th>
+
+
+
+                <th>
+                    <button @onclick="@(e => Sort("first_mid_name"))" class="btn-sort">
+                        First Mid Name
+                    </button>
+                </th>
+                <th>
+                    <button @onclick="@(e => Sort("enrollment_date"))" class="btn-sort">
+                        Enrollment Date
+                    </button>
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Students)
+            {
                 <tr>
-
-                    <th>
-                        <button @onclick="Sort" class="btn-sort">
-                            Last Name
-                        </button>
-                    </th>
-
-
-
-                    <th>First Mid Name</th>
-                    <th>Enrollment Date</th>
+                    <td>@student.LastName</td>
+                    <td>@student.FirstMidName</td>
+                    <td>@student.EnrollmentDate.ToShortDateString()</td>
 
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var student in Students)
-                {
-                    <tr>
-                        <td>@student.LastName</td>
-                        <td>@student.FirstMidName</td>
-                        <td>@student.EnrollmentDate.ToShortDateString()</td>
+            }
+        </tbody>
+    </table>
 
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">Previous</a>
+            </li>
 
-    <div id="bd-activity-indicator" class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
+            @for (int i = 0; i < Students.TotalPages; i++)
+            {
+                int index = i + 1;
+                <li class="page-item">
+                    <NavLink class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(index))">
+                        @(index)
+                    </NavLink>
+                </li>
+            }
 
-</div>
+            <li class="page-item active">
+                <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+
+
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+
+
+
 @code {
+    #region pagination
+    [Parameter]
+    public int? PageIndex { get; set; }
+
+    [Parameter]
+    public int pageSize { get; set; }
+    #endregion
 
 
     [Parameter]
     public string sortOrder { get; set; }
 
     [Parameter]
-    public string NameSort { get; set; }
+    public string LastNameSort { get; set; }
 
     [Parameter]
-    public string DateSort { get; set; }
+    public string FirstMidNameSort { get; set; }
+
+    [Parameter]
+    public string EnrollmentDateSort { get; set; }
 
 
-    public IList<Student> Students { get; set; }
+    public IQueryable<Student> studentsIQ { get; set; }
+    public PaginatedList<Student> Students { get; set; }
 
-    public void Sort()
+    public async void Sort(string order)
     {
-        if (string.IsNullOrWhiteSpace(sortOrder))
-        {
-            sortOrder = "sort_asc";
-            Students = Students.OrderBy(order => order.LastName).ToList();
-            return;
-        }
-
         sortOrder = (sortOrder == "sort_desc" ? "sort_asc" : "sort_desc");
 
-        if (sortOrder == "sort_desc")
+        switch (order)
         {
-            Students = Students.OrderByDescending(order => order.LastName).ToList();
+
+            case "last_name":
+
+                if (sortOrder == "sort_desc")
+                {
+                    studentsIQ = studentsIQ.OrderByDescending(order => order.LastName);
+                }
+
+                if (sortOrder == "sort_asc")
+                {
+                    studentsIQ = studentsIQ.OrderBy(order => order.LastName);
+                }
+                break;
+
+            case "first_mid_name":
+                if (sortOrder == "sort_desc")
+                {
+                    studentsIQ = studentsIQ.OrderByDescending(order => order.FirstMidName);
+                }
+
+                if (sortOrder == "sort_asc")
+                {
+                    studentsIQ = studentsIQ.OrderBy(order => order.FirstMidName);
+                }
+                break;
+
+            case "enrollment_date":
+                if (sortOrder == "sort_desc")
+                {
+                    studentsIQ = studentsIQ.OrderByDescending(order => order.EnrollmentDate);
+                }
+
+                if (sortOrder == "sort_asc")
+                {
+                    studentsIQ = studentsIQ.OrderBy(order => order.EnrollmentDate);
+                }
+                break;
+
+            default:
+
+                sortOrder = "sort_asc";
+                studentsIQ = studentsIQ.OrderBy(order => order.LastName);
+                break;
+
+
         }
 
-        if (sortOrder == "sort_asc")
-        {
-            Students = Students.OrderBy(order => order.LastName).ToList();
-        }
+        Students = await PaginatedList<Student>.CreateAsync(
+                studentsIQ.AsNoTracking(), PageIndex ?? 1, pageSize);
     }
 
-    protected override async Task OnInitializedAsync()
+    public void  Next()
     {
-        //await JsRuntime.InvokeAsync<string>("showIndicator");
 
-        Students = await StudentService.GetStudentsAsync();
+    }
 
-        //await JsRuntime.InvokeAsync<string>("hideIndicator");
+    public async void CurrentPage(int pageIndex)
+    {
+        PageIndex = pageIndex;
+        PageIndex = PageIndex ?? 1;
+
+        await GetAllStudents();
+    }
+
+    public void  Previous()
+    {
+
+    }
+
+    public async Task GetAllStudents()
+    {
+        try
+        {
+            IQueryable<Student> studentsIQ =  StudentService.GetStudentsQueryable();
+
+            Students = await PaginatedList<Student>.CreateAsync(
+                    studentsIQ.AsNoTracking(), 1, 5);
+        }
+        catch (Exception ex)
+        {
+
+            await JsRuntime.InvokeAsync<string>("alert", $"{ex.Message}");
+
+        }
 
 
     }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+            await    GetAllStudents();
+
+    }
+   
 
 
 }

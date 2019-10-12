@@ -25,6 +25,7 @@ namespace BlazorDash.Services
 
         public  Task<List<Student>> GetStudentsAsync()
         {
+
             var students = _context.Students.ToListAsync();
             return students;
         }

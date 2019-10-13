@@ -1,5 +1,5 @@
 ﻿@page "/fetchdata"
-@page "/fetchdata/{sortOrder}"
+
 
 @using BlazorDash.Data
 @using BlazorDash.Services
@@ -66,8 +66,8 @@ else
 
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    <li class="page-item@(Students.HasPreviousPage?"":" disabled")">
+                        <a class="page-link" href="javascript: void(0);" @onclick="Previous">Previous</a>
                     </li>
 
                     @for (int i = 0; i < Students.TotalPages; i++)
@@ -84,11 +84,11 @@ else
                         </li>
                     }
 
-                 
 
 
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
+
+                    <li class="page-item@(Students.HasNextPage?"":" disabled")">
+                        <a class="page-link" href="javascript: void(0);" @onclick="Next">Next</a>
                     </li>
                 </ul>
             </nav>
@@ -96,17 +96,21 @@ else
 
         </div>
         <div class="col-6">
-            <select  @onchange="ChangePageSize">
-                <option value="5">5
+            <select @onchange="ChangePageSize">
+                <option value="5">
+                    5
                 </option>
-                <option value="10">10
+                <option value="10">
+                    10
                 </option>
-                <option value="15">15
+                <option value="15">
+                    15
                 </option>
-                <option value="20">20
+                <option value="20">
+                    20
                 </option>
             </select>
-            
+
         </div>
     </div>
 
@@ -126,8 +130,10 @@ else
     #endregion
 
 
+
+
     [Parameter]
-    public string sortOrder { get; set; }
+    public string sortOrderState { get; set; } = "last_name_asc";
 
     [Parameter]
     public string LastNameSort { get; set; }
@@ -142,65 +148,110 @@ else
     public IQueryable<Student> studentsIQ { get; set; }
     public PaginatedList<Student> Students { get; set; }
 
-    public async void Sort(string order)
+    public void Sort(string order = "")
     {
-        sortOrder = (sortOrder == "sort_desc" ? "sort_asc" : "sort_desc");
 
-        switch (order)
+
+        if (order == "last_name")
         {
-
-            case "last_name":
-
-                if (sortOrder == "sort_desc")
-                {
-                    studentsIQ = studentsIQ.OrderByDescending(order => order.LastName);
-                }
-
-                if (sortOrder == "sort_asc")
-                {
-                    studentsIQ = studentsIQ.OrderBy(order => order.LastName);
-                }
-                break;
-
-            case "first_mid_name":
-                if (sortOrder == "sort_desc")
-                {
-                    studentsIQ = studentsIQ.OrderByDescending(order => order.FirstMidName);
-                }
-
-                if (sortOrder == "sort_asc")
-                {
-                    studentsIQ = studentsIQ.OrderBy(order => order.FirstMidName);
-                }
-                break;
-
-            case "enrollment_date":
-                if (sortOrder == "sort_desc")
-                {
-                    studentsIQ = studentsIQ.OrderByDescending(order => order.EnrollmentDate);
-                }
-
-                if (sortOrder == "sort_asc")
-                {
-                    studentsIQ = studentsIQ.OrderBy(order => order.EnrollmentDate);
-                }
-                break;
-
-            default:
-
-                sortOrder = "sort_asc";
-                studentsIQ = studentsIQ.OrderBy(order => order.LastName);
-                break;
-
-
+            if (sortOrderState.Contains("asc"))
+            {
+                sortOrderState = $"{order}_desc";
+            }
+            else
+            {
+                sortOrderState = $"{order}_asc";
+            }
+        }
+        if (order == "first_mid_name")
+        {
+            if (sortOrderState.Contains("asc"))
+            {
+                sortOrderState = $"{order}_desc";
+            }
+            else
+            {
+                sortOrderState = $"{order}_asc";
+            }
+        }
+        if (order == "enrollment_date")
+        {
+           if (sortOrderState.Contains("asc"))
+            {
+                sortOrderState = $"{order}_desc";
+            }
+            else
+            {
+                sortOrderState = $"{order}_asc";
+            }
         }
 
-        Students = await PaginatedList<Student>.CreateAsync(
+
+        if (sortOrderState.Contains("last_name"))
+        {
+            if (sortOrderState.Contains("asc"))
+            {
+                studentsIQ = studentsIQ.OrderBy(order => order.LastName);
+                sortOrderState = "last_name_asc";
+
+            }
+            else
+            {
+                studentsIQ = studentsIQ.OrderByDescending(order => order.LastName);
+                sortOrderState = "last_name_desc";
+            }
+        }
+
+
+        if (sortOrderState.Contains("first_mid_name"))
+        {
+            if (sortOrderState.Contains("asc"))
+            {
+                studentsIQ = studentsIQ.OrderBy(order => order.FirstMidName);
+                sortOrderState = "first_mid_name_asc";
+
+
+            }
+            else
+            {
+                studentsIQ = studentsIQ.OrderByDescending(order => order.FirstMidName);
+                sortOrderState = "first_mid_name_desc";
+
+            }
+        }
+
+
+        if (sortOrderState.Contains("enrollment_date"))
+        {
+            if (sortOrderState.Contains("asc"))
+            {
+                studentsIQ = studentsIQ.OrderBy(order => order.EnrollmentDate);
+                sortOrderState = "enrollment_date_asc";
+
+
+            }
+            else
+            {
+                studentsIQ = studentsIQ.OrderByDescending(order => order.EnrollmentDate);
+                sortOrderState = "enrollment_date_desc";
+
+            }
+        }
+
+
+
+
+        Students = PaginatedList<Student>.CreateAsync(
                 studentsIQ.AsNoTracking(), PageIndex, pageSize);
     }
 
-    public void  Next()
+    public async void Next()
     {
+        if (Students.HasNextPage)
+        {
+            PageIndex = PageIndex + 1;
+            await GetAllStudents();
+        }
 
     }
 
@@ -211,8 +262,13 @@ else
         await GetAllStudents();
     }
 
-    public void  Previous()
+    public async void Previous()
     {
+        if (Students.HasPreviousPage)
+        {
+            PageIndex = PageIndex - 1;
+            await GetAllStudents();
+        }
 
     }
 
@@ -226,10 +282,14 @@ else
     {
         try
         {
-            IQueryable<Student> studentsIQ =  StudentService.GetStudentsQueryable();
 
-            Students = await PaginatedList<Student>.CreateAsync(
+            studentsIQ = StudentService.GetStudentsQueryable();
+
+            Students = PaginatedList<Student>.CreateAsync(
                     studentsIQ.AsNoTracking(), PageIndex, pageSize);
+
+            //mentain sort state
+            Sort();
         }
         catch (Exception ex)
         {
@@ -244,7 +304,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        await    GetAllStudents();
+        await GetAllStudents();
 
     }
 

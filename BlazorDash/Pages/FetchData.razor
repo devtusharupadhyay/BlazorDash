@@ -63,16 +63,18 @@ else
 
     <div class="row">
         <div class="col-6">
-
+            @{ int index = 0;}
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                   
+                    <li class="page-item" disabled>
+                        <a class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(PageIndex-1))">Previous</a>
                     </li>
+
 
                     @for (int i = 0; i < Students.TotalPages; i++)
                     {
-                        int index = i + 1;
+                        index = i + 1;
                         <li class="page-item@(index==PageIndex?" active":"")">
                             <NavLink class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(index))">
                                 @(index)
@@ -83,12 +85,9 @@ else
                             </NavLink>
                         </li>
                     }
-
                  
-
-
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
+                    <li class="page-item" >
+                        <a class="page-link" href="javascript: void(0);" @onclick="@(e => CurrentPage(PageIndex+1))">Next</a>
                     </li>
                 </ul>
             </nav>
@@ -96,17 +95,21 @@ else
 
         </div>
         <div class="col-6">
-            <select  @onchange="ChangePageSize">
-                <option value="5">5
+            <select @onchange="ChangePageSize">
+                <option value="5">
+                    5
                 </option>
-                <option value="10">10
+                <option value="10">
+                    10
                 </option>
-                <option value="15">15
+                <option value="15">
+                    15
                 </option>
-                <option value="20">20
+                <option value="20">
+                    20
                 </option>
             </select>
-            
+
         </div>
     </div>
 
@@ -142,7 +145,7 @@ else
     public IQueryable<Student> studentsIQ { get; set; }
     public PaginatedList<Student> Students { get; set; }
 
-    public async void Sort(string order)
+    public void Sort(string order)
     {
         sortOrder = (sortOrder == "sort_desc" ? "sort_asc" : "sort_desc");
 
@@ -195,11 +198,11 @@ else
 
         }
 
-        Students = await PaginatedList<Student>.CreateAsync(
+        Students = PaginatedList<Student>.create(
                 studentsIQ.AsNoTracking(), PageIndex, pageSize);
     }
 
-    public void  Next()
+    public void Next()
     {
 
     }
@@ -211,7 +214,7 @@ else
         await GetAllStudents();
     }
 
-    public void  Previous()
+    public void Previous()
     {
 
     }
@@ -226,9 +229,9 @@ else
     {
         try
         {
-            IQueryable<Student> studentsIQ =  StudentService.GetStudentsQueryable();
+            IQueryable<Student> studentsIQ = StudentService.GetStudentsQueryable();
 
-            Students = await PaginatedList<Student>.CreateAsync(
+            Students = PaginatedList<Student>.create(
                     studentsIQ.AsNoTracking(), PageIndex, pageSize);
         }
         catch (Exception ex)
@@ -244,7 +247,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        await    GetAllStudents();
+        await GetAllStudents();
 
     }
 

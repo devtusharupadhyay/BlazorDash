@@ -1,33 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "F:\\ASPNET\\Blazor\\BlazorDash\\BlazorDash\\BlazorDash.csproj": {}
+    "D:\\BlazorDash\\BlazorDash\\BlazorDash.csproj": {}
   },
   "projects": {
-    "F:\\ASPNET\\Blazor\\BlazorDash\\BlazorDash\\BlazorDash.csproj": {
+    "D:\\BlazorDash\\BlazorDash\\BlazorDash.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\ASPNET\\Blazor\\BlazorDash\\BlazorDash\\BlazorDash.csproj",
+        "projectUniqueName": "D:\\BlazorDash\\BlazorDash\\BlazorDash.csproj",
         "projectName": "BlazorDash",
-        "projectPath": "F:\\ASPNET\\Blazor\\BlazorDash\\BlazorDash\\BlazorDash.csproj",
-        "packagesPath": "C:\\Users\\progr\\.nuget\\packages\\",
-        "outputPath": "F:\\ASPNET\\Blazor\\BlazorDash\\BlazorDash\\obj\\",
+        "projectPath": "D:\\BlazorDash\\BlazorDash\\BlazorDash.csproj",
+        "packagesPath": "C:\\Users\\shraddha shree\\.nuget\\packages\\",
+        "outputPath": "D:\\BlazorDash\\BlazorDash\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\progr\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\shraddha shree\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "http://nuget.syncfusion.com/nuget_xamarin/nuget/getsyncfusionpackages/xamarin": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

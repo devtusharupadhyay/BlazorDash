@@ -1,1 +1,3 @@
-﻿<StaticWebAssets Version="1.0" />
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/Blazor.Dash" Path="F:\ASPNET\Blazor\BlazorDash\Blazor.Dash\wwwroot\" />
+</StaticWebAssets>

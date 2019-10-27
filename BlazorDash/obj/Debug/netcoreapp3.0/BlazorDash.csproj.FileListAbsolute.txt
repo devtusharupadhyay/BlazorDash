@@ -77,3 +77,4 @@ F:\ASPNET\Blazor\BlazorDash\BlazorDash\obj\Debug\netcoreapp3.0\RazorDeclaration\
 F:\ASPNET\Blazor\BlazorDash\BlazorDash\obj\Debug\netcoreapp3.0\Razor\Pages\AutoComplete.razor.g.cs
 F:\ASPNET\Blazor\BlazorDash\BlazorDash\obj\Debug\netcoreapp3.0\RazorDeclaration\Pages\Alert.razor.g.cs
 F:\ASPNET\Blazor\BlazorDash\BlazorDash\obj\Debug\netcoreapp3.0\Razor\Pages\Alert.razor.g.cs
+F:\ASPNET\Blazor\BlazorDash\BlazorDash\bin\Debug\netcoreapp3.0\Blazor.Dash.dll
